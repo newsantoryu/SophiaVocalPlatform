@@ -1,0 +1,11 @@
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+build/
+*.ipa
+*.dSYM/
+*.dSYM.zip
+Pods/
+Carthage/Build/

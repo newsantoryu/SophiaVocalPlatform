@@ -1,0 +1,11 @@
+.build/
+Packages/
+.swiftpm/
+DerivedData/
+xcuserdata/
+Package.resolved
+
+.env
+.env.*
+Public/uploads/
+*.log

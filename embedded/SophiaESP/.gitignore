@@ -1,0 +1,4 @@
+.pio/
+build/
+sdkconfig.old
+managed_components/

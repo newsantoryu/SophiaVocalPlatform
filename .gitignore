@@ -1,0 +1,45 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# Credenciais e secrets
+.env
+.env.*
+.netrc
+*.pem
+*.p12
+*.mobileprovision
+
+# Swift / SPM (qualquer pacote no monorepo)
+.build/
+Packages/
+.swiftpm/
+DerivedData/
+xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.dSYM/
+*.dSYM.zip
+*.ipa
+
+# Pastas órfãs de build na raiz (sem código-fonte)
+/SophiaCLI/
+/VocalCore/
+
+# Embedded (Arduino / ESP / PlatformIO)
+.pio/
+sdkconfig.old
+managed_components/
+
+# Node / Python (tools/ futuro)
+node_modules/
+dist/
+__pycache__/
+*.pyc
+.venv/
