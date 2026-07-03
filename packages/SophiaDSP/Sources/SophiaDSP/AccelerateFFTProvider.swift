@@ -8,14 +8,9 @@
 // Buffer PCM → Windowing (Hann) → FFT → magnitude → HPS → FrequencyEstimator
 //           → correção de sub-harmônicos → MusicTheory.analyze → PitchResult
 #if canImport(Accelerate)
-    import Accelerate
-#endif
+import Accelerate
 import Foundation
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MARK: - FFTProcessor
-// ─────────────────────────────────────────────────────────────────────────────
-#if canImport(Accelerate)
 public final class AccelerateFFTProvider: FFTProvider {
 
     private let fftSetup: FFTSetup
@@ -24,31 +19,56 @@ public final class AccelerateFFTProvider: FFTProvider {
     public let halfSize: Int
 
     public init(size: Int) {
-        self.fftSize  = size
+        self.fftSize = size
         self.halfSize = size / 2
-        self.log2n    = vDSP_Length(log2(Float(size)))
+        self.log2n = vDSP_Length(log2(Double(size)).rounded(.down))
 
         guard let setup = vDSP_create_fftsetup(log2n, FFTRadix(kFFTRadix2)) else {
-            fatalError("[FFTProcessor] Falha ao alocar FFT setup para tamanho \(size)")
+            fatalError("FFT setup failure")
         }
+
         self.fftSetup = setup
     }
 
-    deinit { vDSP_destroy_fftsetup(fftSetup) }
-
-    func performFFT(input: [Float]) -> [Float] {
-        var real = input
-        var imag = [Float](repeating: 0, count: fftSize)
-        var splitComplex = DSPSplitComplex(realp: &real, imagp: &imag)
-        vDSP_fft_zip(fftSetup, &splitComplex, 1, log2n, FFTDirection(FFT_FORWARD))
-
-        var magnitudes = [Float](repeating: 0, count: halfSize)
-        vDSP_zvmags(&splitComplex, 1, &magnitudes, 1, vDSP_Length(halfSize))
-        return magnitudes
+    deinit {
+        vDSP_destroy_fftsetup(fftSetup)
     }
 
-    func computeMagnitudes(real: [Float], imag: [Float]) -> [Float] {
-        zip(real, imag).map { r, i in sqrt(r * r + i * i) }
+    public func performFFT(input: [Float]) -> [Float] {
+        var real = input
+        var imag = [Float](repeating: 0, count: fftSize)
+
+        real.withUnsafeMutableBufferPointer { realPtr in
+            imag.withUnsafeMutableBufferPointer { imagPtr in
+
+                var splitComplex = DSPSplitComplex(
+                    realp: realPtr.baseAddress!,
+                    imagp: imagPtr.baseAddress!
+                )
+
+                vDSP_fft_zip(
+                    fftSetup,
+                    &splitComplex,
+                    1,
+                    log2n,
+                    FFTDirection(FFT_FORWARD)
+                )
+
+                var magnitudes = [Float](repeating: 0, count: halfSize)
+
+                vDSP_zvmags(
+                    &splitComplex,
+                    1,
+                    &magnitudes,
+                    1,
+                    vDSP_Length(halfSize)
+                )
+
+                return magnitudes
+            }
+        }
+
+        return []
     }
 }
 #endif

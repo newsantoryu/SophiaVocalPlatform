@@ -13,8 +13,12 @@ let package = Package(
     ],
 
     targets: [
+
         .target(
-            name: "SophiaDSP"
+            name: "SophiaDSP",
+            linkerSettings: [
+                .linkedFramework("Accelerate", .when(platforms: [.iOS, .macOS]))
+            ]
         ),
 
         .testTarget(
