@@ -19,7 +19,7 @@ public final class VocalPitchDetector {
              sampleRate: sampleRate
             )
 
-    guard let freq = output.detectedFrequency else {
+    guard let freq = output.frequency else {
             return nil
             }
 
