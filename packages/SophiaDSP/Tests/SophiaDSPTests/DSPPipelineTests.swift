@@ -15,6 +15,7 @@ struct DSPPipelineTests {
         let pipeline = DSPPipeline(
             stages: [
                 AmplitudeStage(),
+                VoiceActivityStage(),
                 stage
             ]
         )

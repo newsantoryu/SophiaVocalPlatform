@@ -2,11 +2,17 @@ import Foundation
 
 public final class PitchStage: DSPStage {
 
+    // MARK: - Properties
+
     private let yin: YINDetector
+
+    // MARK: - Init
 
     public init(yin: YINDetector) {
         self.yin = yin
     }
+
+    // MARK: - Processing
 
     public func process(
         _ frame: DSPFrame,
@@ -16,9 +22,14 @@ public final class PitchStage: DSPStage {
         var updatedFrame = frame
 
         // Evita processamento desnecessário
-        if frame.isSilent {
+        // Não roda pitch detection em silêncio
+        // nem quando não há atividade vocal detectada
+        guard !frame.isSilent,
+              frame.isVoiceActive else {
+
             updatedFrame.frequency = nil
             updatedFrame.confidence = 0
+
             return updatedFrame
         }
 
