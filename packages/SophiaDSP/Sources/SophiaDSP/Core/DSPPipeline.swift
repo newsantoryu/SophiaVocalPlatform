@@ -1,9 +1,5 @@
 import Foundation
 
-public protocol DSPStage {
-    func process(_ frame: DSPFrame, sampleRate: Float) -> DSPFrame
-}
-
 public final class DSPPipeline {
 
     private let stages: [DSPStage]
