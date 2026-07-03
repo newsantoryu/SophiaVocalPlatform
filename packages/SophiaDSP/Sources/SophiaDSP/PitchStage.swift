@@ -2,17 +2,11 @@ import Foundation
 
 public final class PitchStage: DSPStage {
 
-    // MARK: - Dependencies
-
     private let yin: YINDetector
-
-    // MARK: - Init
 
     public init(yin: YINDetector) {
         self.yin = yin
     }
-
-    // MARK: - Processing
 
     public func process(
         _ frame: DSPFrame,
@@ -20,6 +14,13 @@ public final class PitchStage: DSPStage {
     ) -> DSPFrame {
 
         var updatedFrame = frame
+
+        // Evita processamento desnecessário
+        if frame.isSilent {
+            updatedFrame.frequency = nil
+            updatedFrame.confidence = 0
+            return updatedFrame
+        }
 
         let frequency = yin.detect(
             buffer: frame.samples,

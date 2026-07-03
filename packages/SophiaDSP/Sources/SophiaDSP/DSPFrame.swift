@@ -16,6 +16,8 @@ public struct DSPFrame {
 
     public var timestamp: TimeInterval
 
+    public var rms: Float?
+    public var isSilent: Bool = false
     // MARK: - Init
 
     public init(
