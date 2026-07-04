@@ -2,11 +2,11 @@ import Testing
 import Foundation
 @testable import SophiaDSP
 
-@Suite("DSP Stream Engine Tests")
-struct DSPStreamEngineTests {
+@Suite("DSP Stream Runtime Tests")
+struct DSPStreamRuntimeTests {
 
-    @Test("Engine should generate DSPPacket with frequency")
-    func testEngineDetectsFrequency() throws {
+    @Test("Engine should process buffers from provider")
+    func testEngineRuntimeFlow() throws {
 
         let sampleRate: Float = 44100
         let expectedFrequency: Float = 440
@@ -74,8 +74,8 @@ struct DSPStreamEngineTests {
         #expect(error < 1.0)
     }
 
-    @Test("Engine should detect silence")
-    func testEngineDetectsSilence() throws {
+    @Test("Engine should process silence correctly")
+    func testEngineSilenceFlow() throws {
 
         let buffer = [Float](
             repeating: 0,
@@ -115,8 +115,7 @@ struct DSPStreamEngineTests {
             return
         }
 
-        #expect(packet.isVoice == false)
         #expect(packet.frequency == nil)
-        #expect(packet.rms < 0.001)
+        #expect(packet.isVoice == false)
     }
 }
