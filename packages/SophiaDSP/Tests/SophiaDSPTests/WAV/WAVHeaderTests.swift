@@ -5,7 +5,7 @@ import Foundation
 @Suite("WAV Header Tests")
 struct WAVHeaderTests {
 
-    @Test("Parser should decode a valid WAV header")
+    @Test("WAV Header Parser Tests")
     func parseValidHeader() throws {
 
         var bytes = [UInt8](repeating: 0, count: 44)
@@ -27,8 +27,8 @@ struct WAVHeaderTests {
 
         let data = Data(bytes)
 
-        let header = try WAVFileProvider.parseHeader(from: data)
-
+        let header = try WAVHeaderParser.parse(from: data)
+        
         #expect(header.chunkID == "RIFF")
         #expect(header.format == "WAVE")
     }
