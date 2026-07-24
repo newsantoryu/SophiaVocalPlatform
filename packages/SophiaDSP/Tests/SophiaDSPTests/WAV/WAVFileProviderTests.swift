@@ -22,12 +22,9 @@ struct WAVFileProviderTests {
 
         let provider = try WAVFileProvider(path: url.path)
 
-        #expect(provider.header.chunkID == "RIFF")
-        #expect(provider.header.format == "WAVE")
         #expect(provider.header.audioFormat == 1)
-        #expect(provider.header.numChannels == 1)
-        #expect(provider.header.bitsPerSample == 16)
         #expect(provider.header.sampleRate == 44_100)
+        #expect(provider.header.numChannels == 1)
     }
 }
 

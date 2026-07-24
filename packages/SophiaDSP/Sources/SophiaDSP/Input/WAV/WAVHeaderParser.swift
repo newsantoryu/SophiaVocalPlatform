@@ -1,72 +1,79 @@
 import Foundation
 
-public enum WAVHeaderParser {
+public struct WAVHeaderParser {
 
-    // MARK: - Public
+    public init() {}
 
-    public static func parse(
-        from data: Data
+    public func parse(
+        riff: RIFFFile
     ) throws -> WAVHeader {
 
-        guard data.count >= 44 else {
-            throw WAVError.invalidRIFFHeader
+        guard riff.format == "WAVE" else {
+            throw WAVError.invalidHeader
+        }
+
+        guard
+            let fmt = riff.chunks.chunk(.fmt),
+            let data = riff.chunks.chunk(.data)
+        else {
+            throw WAVError.invalidHeader
+        }
+
+        let payload = fmt.payload
+
+        guard payload.count >= 16 else {
+            throw WAVError.invalidHeader
+        }
+
+        func uint16(_ offset: Int) -> UInt16 {
+
+            payload.withUnsafeBytes {
+
+                UInt16(
+                    littleEndian: $0.load(
+                        fromByteOffset: offset,
+                        as: UInt16.self
+                    )
+                )
+
+            }
+
+        }
+
+        func uint32(_ offset: Int) -> UInt32 {
+
+            payload.withUnsafeBytes {
+
+                UInt32(
+                    littleEndian: $0.load(
+                        fromByteOffset: offset,
+                        as: UInt32.self
+                    )
+                )
+
+            }
+
         }
 
         return WAVHeader(
-            chunkID: string(from: data, range: 0..<4),
-            chunkSize: uint32(from: data, offset: 4),
-            format: string(from: data, range: 8..<12),
 
-            subchunk1ID: string(from: data, range: 12..<16),
-            subchunk1Size: uint32(from: data, offset: 16),
-            audioFormat: uint16(from: data, offset: 20),
-            numChannels: uint16(from: data, offset: 22),
-            sampleRate: uint32(from: data, offset: 24),
-            byteRate: uint32(from: data, offset: 28),
-            blockAlign: uint16(from: data, offset: 32),
-            bitsPerSample: uint16(from: data, offset: 34),
+            chunkID: riff.chunkID,
+            chunkSize: riff.chunkSize,
+            format: riff.format,
 
-            subchunk2ID: string(from: data, range: 36..<40),
-            subchunk2Size: uint32(from: data, offset: 40)
+            subchunk1ID: "fmt ",
+            subchunk1Size: fmt.size,
+            audioFormat: uint16(0),
+            numChannels: uint16(2),
+            sampleRate: uint32(4),
+            byteRate: uint32(8),
+            blockAlign: uint16(12),
+            bitsPerSample: uint16(14),
+
+            subchunk2ID: "data",
+            subchunk2Size: data.size
         )
+
     }
 
-    // MARK: - Helpers
-
-    private static func string(
-        from data: Data,
-        range: Range<Int>
-    ) -> String {
-
-        String(
-            data: data.subdata(in: range),
-            encoding: .ascii
-        ) ?? ""
-    }
-
-    private static func uint16(
-        from data: Data,
-        offset: Int
-    ) -> UInt16 {
-
-        data.withUnsafeBytes {
-            $0.load(
-                fromByteOffset: offset,
-                as: UInt16.self
-            )
-        }
-    }
-
-    private static func uint32(
-        from data: Data,
-        offset: Int
-    ) -> UInt32 {
-
-        data.withUnsafeBytes {
-            $0.load(
-                fromByteOffset: offset,
-                as: UInt32.self
-            )
-        }
-    }
 }

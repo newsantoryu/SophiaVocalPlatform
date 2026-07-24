@@ -1,35 +1,69 @@
-import Testing
 import Foundation
+import Testing
 @testable import SophiaDSP
 
 @Suite("WAV Header Tests")
 struct WAVHeaderTests {
 
-    @Test("WAV Header Parser Tests")
+    @Test("Should parse valid WAV header")
     func parseValidHeader() throws {
 
-        var bytes = [UInt8](repeating: 0, count: 44)
+        let data = createMinimalWAV()
 
-        bytes[0] = 82   // R
-        bytes[1] = 73   // I
-        bytes[2] = 70   // F
-        bytes[3] = 70   // F
+        let riff = try RIFFParser().parse(from: data)
 
-        bytes[8] = 87   // W
-        bytes[9] = 65   // A
-        bytes[10] = 86  // V
-        bytes[11] = 69  // E
+        let header = try WAVHeaderParser().parse(riff: riff)
 
-        bytes[12] = 102 // f
-        bytes[13] = 109 // m
-        bytes[14] = 116 // t
-        bytes[15] = 32
-
-        let data = Data(bytes)
-
-        let header = try WAVHeaderParser.parse(from: data)
-        
         #expect(header.chunkID == "RIFF")
         #expect(header.format == "WAVE")
+        #expect(header.audioFormat == 1)
+        #expect(header.numChannels == 1)
+        #expect(header.bitsPerSample == 16)
+    }
+}
+
+// MARK: Helpers
+
+private extension WAVHeaderTests {
+
+    func createMinimalWAV() -> Data {
+
+        var bytes: [UInt8] = []
+
+        func appendString(_ value: String) {
+            bytes.append(contentsOf: value.utf8)
+        }
+
+        func appendUInt16(_ value: UInt16) {
+            var little = value.littleEndian
+            withUnsafeBytes(of: &little) {
+                bytes.append(contentsOf: $0)
+            }
+        }
+
+        func appendUInt32(_ value: UInt32) {
+            var little = value.littleEndian
+            withUnsafeBytes(of: &little) {
+                bytes.append(contentsOf: $0)
+            }
+        }
+
+        appendString("RIFF")
+        appendUInt32(36)
+        appendString("WAVE")
+
+        appendString("fmt ")
+        appendUInt32(16)
+        appendUInt16(1)
+        appendUInt16(1)
+        appendUInt32(44_100)
+        appendUInt32(88_200)
+        appendUInt16(2)
+        appendUInt16(16)
+
+        appendString("data")
+        appendUInt32(0)
+
+        return Data(bytes)
     }
 }

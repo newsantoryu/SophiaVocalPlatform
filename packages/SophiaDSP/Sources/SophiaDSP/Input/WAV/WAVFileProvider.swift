@@ -1,17 +1,18 @@
 import Foundation
 
 public final class WAVFileProvider: AudioBufferProvider {
+
     // MARK: - Properties
 
-    private let data: Data
     public let header: WAVHeader
 
-    private let audioDataOffset: Int
-    private var currentOffset: Int
-
-    private var isRunning = false
+    private let wav: WAVFile
 
     private let bufferSize: Int
+
+    private var currentOffset = 0
+
+    private var isRunning = false
 
     // MARK: - Init
 
@@ -20,15 +21,19 @@ public final class WAVFileProvider: AudioBufferProvider {
         bufferSize: Int = 4096
     ) throws {
 
-        self.data = try Data(contentsOf: URL(fileURLWithPath: path))
-        self.header = try WAVHeaderParser.parse(from: data)
+        let fileData = try Data(
+            contentsOf: URL(fileURLWithPath: path)
+        )
 
-        self.audioDataOffset = 44
-        self.currentOffset = audioDataOffset
+        self.wav = try WAVParser().parse(
+            from: fileData
+        )
 
+        self.header = wav.header
         self.bufferSize = bufferSize
 
-        try validate(header: header)
+        try validate(header)
+
     }
 
     // MARK: - AudioBufferProvider
@@ -37,9 +42,17 @@ public final class WAVFileProvider: AudioBufferProvider {
         onBuffer: @escaping ([Float]) -> Void
     ) throws {
 
+        guard let chunk = wav.audioChunk else {
+            throw AudioInputError.invalidAudioData
+        }
+
         isRunning = true
 
+        let data = chunk.payload
+
         let bytesPerSample = 2
+
+        currentOffset = 0
 
         while isRunning && currentOffset < data.count {
 
@@ -53,38 +66,35 @@ public final class WAVFileProvider: AudioBufferProvider {
             let sampleCount = availableBytes / bytesPerSample
 
             var samples: [Float] = []
+
             samples.reserveCapacity(sampleCount)
 
             for index in 0..<sampleCount {
 
-                let offset = currentOffset + (index * bytesPerSample)
+                let offset = currentOffset + index * bytesPerSample
 
-                let value: Int16 = data.withUnsafeBytes {
-                    $0.load(
-                        fromByteOffset: offset,
-                        as: Int16.self
-                    )
-                }
+                let value = data.int16LE(at: offset)
 
                 let normalized: Float
 
                 if value == Int16.min {
-                    normalized = -1.0
+                    normalized = -1
                 } else {
                     normalized = Float(value) / Float(Int16.max)
                 }
 
                 samples.append(normalized)
+
             }
 
             currentOffset += sampleCount * bytesPerSample
 
-            guard !samples.isEmpty else {
-                continue
+            if !samples.isEmpty {
+                onBuffer(samples)
             }
 
-            onBuffer(samples)
         }
+
     }
 
     public func stop() {
@@ -94,16 +104,8 @@ public final class WAVFileProvider: AudioBufferProvider {
     // MARK: - Validation
 
     private func validate(
-        header: WAVHeader
+        _ header: WAVHeader
     ) throws {
-
-        guard header.chunkID == "RIFF" else {
-            throw WAVError.invalidRIFFHeader
-        }
-
-        guard header.format == "WAVE" else {
-            throw WAVError.invalidWAVEFormat
-        }
 
         guard header.audioFormat == WAVFormat.pcm.rawValue else {
             throw WAVError.unsupportedAudioFormat
@@ -116,5 +118,7 @@ public final class WAVFileProvider: AudioBufferProvider {
         guard header.numChannels == 1 else {
             throw WAVError.unsupportedChannelConfiguration
         }
+
     }
+
 }

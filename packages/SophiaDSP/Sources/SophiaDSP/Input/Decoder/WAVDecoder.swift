@@ -21,8 +21,7 @@ public final class WAVDecoder {
 
     // MARK: - Private Properties
 
-    private let data: Data?
-    private let audioDataOffset: Int
+    private let wavFile: WAVFile?
     private let decoder: PCMDecoder
 
     // MARK: - Initializers
@@ -33,18 +32,17 @@ public final class WAVDecoder {
             contentsOf: URL(fileURLWithPath: path)
         )
 
-       let header = try WAVHeaderParser.parse(
+        let wav = try WAVParser().parse(
             from: fileData
         )
 
-        self.header = header
-        self.data = fileData
-        self.audioDataOffset = 44
+        self.wavFile = wav
+        self.header = wav.header
 
         self.format = PCMFormat(
-            bitDepth: Int(header.bitsPerSample),
-            sampleRate: Float(header.sampleRate),
-            channels: Int(header.numChannels)
+            bitDepth: wav.bitDepth,
+            sampleRate: wav.sampleRate,
+            channels: wav.channels
         )
 
         self.decoder = try AudioDecoderFactory.makeDecoder(
@@ -55,9 +53,8 @@ public final class WAVDecoder {
     /// Utilizado principalmente pelos testes.
     public init(header: WAVHeader) throws {
 
+        self.wavFile = nil
         self.header = header
-        self.data = nil
-        self.audioDataOffset = 44
 
         self.format = PCMFormat(
             bitDepth: Int(header.bitsPerSample),
@@ -72,25 +69,26 @@ public final class WAVDecoder {
 
     // MARK: - Public
 
-    /// Decodifica um arquivo WAV carregado pelo init(path:)
     public func decode() throws -> [Float] {
 
-        guard let data else {
+        guard
+            let wav = wavFile,
+            let audioChunk = wav.audioChunk
+        else {
             throw AudioInputError.invalidAudioData
         }
 
-        let pcmData = data.subdata(
-            in: audioDataOffset..<data.count
+        return try decoder.decode(
+            audioChunk.payload
         )
-
-        return try decoder.decode(pcmData)
     }
 
-    /// Decodifica dados PCM diretamente.
     public func decode(
         data: Data
     ) throws -> [Float] {
 
         try decoder.decode(data)
+
     }
+
 }

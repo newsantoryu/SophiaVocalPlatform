@@ -25,12 +25,7 @@ public struct PCM16Decoder: PCMDecoder {
 
             let offset = index * bytesPerSample
 
-            let value: Int16 = data.withUnsafeBytes {
-                $0.load(
-                    fromByteOffset: offset,
-                    as: Int16.self
-                )
-            }
+            let value = data.int16LE(at: offset)
 
             samples.append(
                 Float(value) / Float(Int16.max)
