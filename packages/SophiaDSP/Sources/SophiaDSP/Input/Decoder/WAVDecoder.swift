@@ -4,45 +4,44 @@ public final class WAVDecoder {
 
     // MARK: - Public Properties
 
-    public let header: WAVHeader
+    public let wav: WAVFile
+
     public let format: PCMFormat
 
     public var sampleRate: UInt32 {
-        header.sampleRate
+        wav.format.sampleRate
     }
 
     public var channels: UInt16 {
-        header.numChannels
+        wav.format.numChannels
     }
 
     public var bitDepth: UInt16 {
-        header.bitsPerSample
+        wav.format.bitsPerSample
     }
 
     // MARK: - Private Properties
 
-    private let wavFile: WAVFile?
     private let decoder: PCMDecoder
 
     // MARK: - Initializers
 
-    public init(path: String) throws {
+    public init(
+        path: String
+    ) throws {
 
-        let fileData = try Data(
+        let data = try Data(
             contentsOf: URL(fileURLWithPath: path)
         )
 
-        let wav = try WAVParser().parse(
-            from: fileData
+        self.wav = try WAVParser().parse(
+            from: data
         )
 
-        self.wavFile = wav
-        self.header = wav.header
-
         self.format = PCMFormat(
-            bitDepth: wav.bitDepth,
-            sampleRate: wav.sampleRate,
-            channels: wav.channels
+            bitDepth: Int(wav.format.bitsPerSample),
+            sampleRate: Float(wav.format.sampleRate),
+            channels: Int(wav.format.numChannels)
         )
 
         self.decoder = try AudioDecoderFactory.makeDecoder(
@@ -51,15 +50,17 @@ public final class WAVDecoder {
     }
 
     /// Utilizado principalmente pelos testes.
-    public init(header: WAVHeader) throws {
 
-        self.wavFile = nil
-        self.header = header
+    public init(
+        wav: WAVFile
+    ) throws {
+
+        self.wav = wav
 
         self.format = PCMFormat(
-            bitDepth: Int(header.bitsPerSample),
-            sampleRate: Float(header.sampleRate),
-            channels: Int(header.numChannels)
+            bitDepth: Int(wav.format.bitsPerSample),
+            sampleRate: Float(wav.format.sampleRate),
+            channels: Int(wav.format.numChannels)
         )
 
         self.decoder = try AudioDecoderFactory.makeDecoder(
@@ -71,16 +72,10 @@ public final class WAVDecoder {
 
     public func decode() throws -> [Float] {
 
-        guard
-            let wav = wavFile,
-            let audioChunk = wav.audioChunk
-        else {
-            throw AudioInputError.invalidAudioData
-        }
-
-        return try decoder.decode(
-            audioChunk.payload
+        try decoder.decode(
+            wav.data.pcmData
         )
+
     }
 
     public func decode(

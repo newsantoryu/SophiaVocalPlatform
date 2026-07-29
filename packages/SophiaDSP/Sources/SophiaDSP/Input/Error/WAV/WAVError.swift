@@ -11,4 +11,6 @@ public enum WAVError: Error {
 
     case invalidHeader
     case invalidDataChunk
+    case invalidFormatChunk
+    case invalidChunk
 }

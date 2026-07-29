@@ -7,7 +7,6 @@ public final class WAVSource: AudioSource {
     public let metadata: AudioMetadata
 
     private let url: URL
-    private let data: Data
     private let wav: WAVFile
 
     private var isOpen = false
@@ -18,25 +17,25 @@ public final class WAVSource: AudioSource {
     public init(path: String) throws {
 
         self.url = URL(fileURLWithPath: path)
-        self.data = try Data(contentsOf: url)
+
+        let data = try Data(contentsOf: url)
 
         self.wav = try WAVParser().parse(
             from: data
         )
 
-        let header = wav.header
-
-        guard header.audioFormat == WAVFormat.pcm.rawValue else {
+        guard wav.format.audioFormat == WAVFormat.pcm.rawValue else {
             throw AudioInputError.unsupportedFormat
         }
 
-        let duration = Double(header.subchunk2Size)
-            / Double(header.byteRate)
+        let duration =
+            Double(wav.data.pcmData.count) /
+            Double(wav.format.byteRate)
 
         self.metadata = AudioMetadata(
-            sampleRate: Float(header.sampleRate),
-            channels: Int(header.numChannels),
-            bitDepth: Int(header.bitsPerSample),
+            sampleRate: Float(wav.format.sampleRate),
+            channels: Int(wav.format.numChannels),
+            bitDepth: Int(wav.format.bitsPerSample),
             codec: .wav,
             duration: duration
         )
@@ -45,8 +44,10 @@ public final class WAVSource: AudioSource {
     // MARK: - AudioSource
 
     public func open() throws {
+
         isOpen = true
         hasRead = false
+
     }
 
     public func read() throws -> Data? {
@@ -61,15 +62,13 @@ public final class WAVSource: AudioSource {
 
         hasRead = true
 
-        guard let audioChunk = wav.audioChunk else {
-            throw WAVError.invalidHeader
-        }
-
-        return audioChunk.payload
+        return wav.data.pcmData
     }
 
     public func close() {
+
         isOpen = false
+
     }
 
 }

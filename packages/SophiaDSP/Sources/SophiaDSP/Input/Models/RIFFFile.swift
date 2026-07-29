@@ -1,18 +1,14 @@
-import Foundation
-
 public struct RIFFFile {
 
-    // MARK: - RIFF Header
+    // RIFF Header
 
     public let chunkID: String
     public let chunkSize: UInt32
     public let format: String
 
-    // MARK: - Chunks
+    // Todos os chunks encontrados
 
     public let chunks: WAVChunkCollection
-
-    // MARK: - Init
 
     public init(
         chunkID: String,
@@ -20,10 +16,10 @@ public struct RIFFFile {
         format: String,
         chunks: WAVChunkCollection
     ) {
+
         self.chunkID = chunkID
         self.chunkSize = chunkSize
         self.format = format
         self.chunks = chunks
     }
-
 }
