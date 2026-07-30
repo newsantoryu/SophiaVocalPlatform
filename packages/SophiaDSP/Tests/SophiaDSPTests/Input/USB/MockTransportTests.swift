@@ -14,7 +14,7 @@ struct MockTransportTests {
 
         #expect(transport.isOpen == false)
 
-        try transport.open()
+        transport.open()
 
         #expect(transport.isOpen)
     }
@@ -26,7 +26,7 @@ struct MockTransportTests {
             packets: []
         )
 
-        try transport.open()
+        transport.open()
 
         transport.close()
 
@@ -42,7 +42,7 @@ struct MockTransportTests {
             packets: [expected]
         )
 
-        try transport.open()
+        transport.open()
 
         let packet = try transport.read(
             maxLength: 64
@@ -58,7 +58,7 @@ struct MockTransportTests {
             packets: []
         )
 
-        try transport.open()
+        transport.open()
 
         let packet = try transport.read(
             maxLength: 64
