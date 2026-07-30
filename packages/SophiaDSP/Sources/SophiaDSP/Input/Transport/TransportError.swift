@@ -15,4 +15,6 @@ public enum TransportError: Error {
     case readFailed
 
     case writeFailed
+
+    case invalidSync
 }
