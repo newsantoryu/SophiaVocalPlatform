@@ -1,6 +1,6 @@
 import Foundation
 
-public struct USBPacketHeader: Equatable, Sendable {
+public struct SATPHeader: Equatable, Sendable {
 
     // MARK: - Constants
 

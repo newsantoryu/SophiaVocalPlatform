@@ -10,7 +10,7 @@ struct PacketValidatorTests {
 
         let payload = Data([1,2,3])
 
-        let header = USBPacketHeader(
+        let header = SATPHeader(
             sequence: 1,
             timestamp: 100,
             payloadSize: 3,
@@ -33,7 +33,7 @@ struct PacketValidatorTests {
 
         let payload = Data([1,2,3])
 
-        let header = USBPacketHeader(
+        let header = SATPHeader(
             sequence: 1,
             timestamp: 0,
             payloadSize: 3,
@@ -42,7 +42,7 @@ struct PacketValidatorTests {
 
         let validator = PacketValidator()
 
-        #expect(throws: USBPacketError.self) {
+        #expect(throws: SATPError.self) {
 
             try validator.validate(
                 header: header,

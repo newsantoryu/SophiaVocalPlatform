@@ -2,13 +2,13 @@ import Foundation
 import Testing
 @testable import SophiaDSP
 
-@Suite("USB Packet Header Tests")
-struct USBPacketHeaderTests {
+@Suite("SATP Packet Header Tests")
+struct SATPHeaderTests {
 
     @Test("Should preserve payload size")
     func preservePayloadSize() {
 
-        let header = USBPacketHeader(
+        let header = SATPHeader(
             sequence: 1,
             timestamp: 100,
             payloadSize: 512,
@@ -21,7 +21,7 @@ struct USBPacketHeaderTests {
     @Test("Should preserve crc")
     func preserveCRC() {
 
-        let header = USBPacketHeader(
+        let header = SATPHeader(
             sequence: 5,
             timestamp: 200,
             payloadSize: 128,
@@ -34,7 +34,7 @@ struct USBPacketHeaderTests {
     @Test("Should preserve sequence")
     func preserveSequence() {
 
-        let header = USBPacketHeader(
+        let header = SATPHeader(
             sequence: 42,
             timestamp: 0,
             payloadSize: 64,
@@ -47,7 +47,7 @@ struct USBPacketHeaderTests {
     @Test("Should preserve timestamp")
     func preserveTimestamp() {
 
-        let header = USBPacketHeader(
+        let header = SATPHeader(
             sequence: 0,
             timestamp: 9999,
             payloadSize: 64,
@@ -60,7 +60,7 @@ struct USBPacketHeaderTests {
     @Test("Should expose sync bytes")
     func exposeSyncBytes() {
 
-        #expect(USBPacketHeader.sync0 == 0xAA)
-        #expect(USBPacketHeader.sync1 == 0x55)
+        #expect(SATPHeader.sync0 == 0xAA)
+        #expect(SATPHeader.sync1 == 0x55)
     }
 }

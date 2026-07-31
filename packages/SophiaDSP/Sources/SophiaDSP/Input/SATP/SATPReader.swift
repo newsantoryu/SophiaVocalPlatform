@@ -1,6 +1,6 @@
 import Foundation
 
-public final class USBPacketReader {
+public final class SATPReader {
 
     private let transport: Transport
 

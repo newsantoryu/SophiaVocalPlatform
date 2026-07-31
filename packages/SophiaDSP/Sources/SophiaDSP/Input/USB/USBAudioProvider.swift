@@ -7,7 +7,7 @@ public final class USBAudioProvider: AudioBufferProvider {
     private let transport: Transport
     private let format: PCMFormat
 
-    private let packetReader: USBPacketReader
+    private let packetReader: SATPReader
     private let decoder: PCM16Decoder
 
     private var isRunning = false
@@ -22,7 +22,7 @@ public final class USBAudioProvider: AudioBufferProvider {
         self.transport = transport
         self.format = format
 
-        self.packetReader = USBPacketReader(
+        self.packetReader = SATPReader(
             transport: transport
         )
 

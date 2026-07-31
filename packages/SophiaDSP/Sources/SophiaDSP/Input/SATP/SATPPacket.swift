@@ -1,13 +1,13 @@
 import Foundation
 
-public struct USBPacket: Sendable {
+public struct SATPPacket: Sendable {
 
-    public let header: USBPacketHeader
+    public let header: SATPHeader
 
     public let payload: Data
 
     public init(
-        header: USBPacketHeader,
+        header: SATPHeader,
         payload: Data
     ) {
         self.header = header

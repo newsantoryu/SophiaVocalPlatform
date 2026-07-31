@@ -14,8 +14,8 @@ public struct SyncDetector {
 
         for index in 0..<(data.count - 1) {
 
-            if data[index] == USBPacketHeader.sync0 &&
-                data[index + 1] == USBPacketHeader.sync1 {
+            if data[index] == SATPHeader.sync0 &&
+                data[index + 1] == SATPHeader.sync1 {
 
                 return index
             }

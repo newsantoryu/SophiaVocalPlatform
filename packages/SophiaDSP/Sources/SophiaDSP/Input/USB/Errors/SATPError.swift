@@ -1,6 +1,6 @@
 import Foundation
 
-public enum USBPacketError: Error {
+public enum SATPError: Error {
 
     case invalidSync
     case invalidHeader

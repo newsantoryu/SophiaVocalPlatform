@@ -2,8 +2,8 @@ import Foundation
 import Testing
 @testable import SophiaDSP
 
-@Suite("USB Packet Reader Tests")
-struct USBPacketReaderTests {
+@Suite("SATP Packet Reader Tests")
+struct SATPReaderTests {
 
     @Test("Should read packet from transport")
     func readPacket() throws {
@@ -21,7 +21,7 @@ struct USBPacketReaderTests {
 
         transport.open()
 
-        let reader = USBPacketReader(
+        let reader = SATPReader(
             transport: transport
         )
 
@@ -39,7 +39,7 @@ struct USBPacketReaderTests {
 
         transport.open()
 
-        let reader = USBPacketReader(
+        let reader = SATPReader(
             transport: transport
         )
 
@@ -63,7 +63,7 @@ struct USBPacketReaderTests {
 
         transport.open()
 
-        let reader = USBPacketReader(
+        let reader = SATPReader(
             transport: transport
         )
 
@@ -85,7 +85,7 @@ struct USBPacketReaderTests {
 
         transport.open()
 
-        let reader = USBPacketReader(
+        let reader = SATPReader(
             transport: transport
         )
 
@@ -112,7 +112,7 @@ struct USBPacketReaderTests {
 
         transport.open()
 
-        let reader = USBPacketReader(
+        let reader = SATPReader(
             transport: transport
         )
 
@@ -138,7 +138,7 @@ struct USBPacketReaderTests {
 
         transport.open()
 
-        let reader = USBPacketReader(
+        let reader = SATPReader(
             transport: transport
         )
 

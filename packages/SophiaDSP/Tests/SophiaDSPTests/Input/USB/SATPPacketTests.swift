@@ -2,22 +2,22 @@ import Foundation
 import Testing
 @testable import SophiaDSP
 
-@Suite("USB Packet Tests")
-struct USBPacketTests {
+@Suite("SATP Packet Tests")
+struct SATPPacketTests {
 
     @Test("Should preserve payload")
     func preservePayload() {
 
         let payload = Data([1,2,3,4])
 
-        let header = USBPacketHeader(
+        let header = SATPHeader(
             sequence: 10,
             timestamp: 100,
             payloadSize: UInt16(payload.count),
             crc: 55
         )
 
-        let packet = USBPacket(
+        let packet = SATPPacket(
             header: header,
             payload: payload
         )
@@ -28,14 +28,14 @@ struct USBPacketTests {
     @Test("Should preserve sequence")
     func preserveSequence() {
 
-        let header = USBPacketHeader(
+        let header = SATPHeader(
             sequence: 42,
             timestamp: 0,
             payloadSize: 0,
             crc: 0
         )
 
-        let packet = USBPacket(
+        let packet = SATPPacket(
             header: header,
             payload: Data()
         )
@@ -46,14 +46,14 @@ struct USBPacketTests {
     @Test("Should preserve timestamp")
     func preserveTimestamp() {
 
-        let header = USBPacketHeader(
+        let header = SATPHeader(
             sequence: 0,
             timestamp: 9999,
             payloadSize: 0,
             crc: 0
         )
 
-        let packet = USBPacket(
+        let packet = SATPPacket(
             header: header,
             payload: Data()
         )
@@ -66,14 +66,14 @@ struct USBPacketTests {
 
         let payload = Data(repeating: 0, count: 128)
 
-        let header = USBPacketHeader(
+        let header = SATPHeader(
             sequence: 0,
             timestamp: 0,
             payloadSize: UInt16(payload.count),
             crc: 0
         )
 
-        let packet = USBPacket(
+        let packet = SATPPacket(
             header: header,
             payload: payload
         )
@@ -84,14 +84,14 @@ struct USBPacketTests {
     @Test("Should preserve crc")
     func preserveCRC() {
 
-        let header = USBPacketHeader(
+        let header = SATPHeader(
             sequence: 0,
             timestamp: 0,
             payloadSize: 0,
             crc: 777
         )
 
-        let packet = USBPacket(
+        let packet = SATPPacket(
             header: header,
             payload: Data()
         )

@@ -1,10 +1,10 @@
 import Foundation
 
-public struct USBPacketHeaderParser {
+public struct SATPHeaderParser {
 
     public init() {}
 
-    public func parse(from data: Data) throws -> USBPacketHeader {
+    public func parse(from data: Data) throws -> SATPHeader {
 
         var reader = DataReader(data: data)
 
@@ -12,10 +12,10 @@ public struct USBPacketHeaderParser {
         let sync1 = try reader.readUInt8()
 
         guard
-            sync0 == USBPacketHeader.sync0,
-            sync1 == USBPacketHeader.sync1
+            sync0 == SATPHeader.sync0,
+            sync1 == SATPHeader.sync1
         else {
-            throw USBPacketError.invalidSync
+            throw SATPError.invalidSync
         }
 
         let sequence = try reader.readUInt32()
@@ -26,7 +26,7 @@ public struct USBPacketHeaderParser {
 
         let crc = try reader.readUInt16()
 
-        return USBPacketHeader(
+        return SATPHeader(
             sequence: sequence,
             timestamp: timestamp,
             payloadSize: payloadSize,

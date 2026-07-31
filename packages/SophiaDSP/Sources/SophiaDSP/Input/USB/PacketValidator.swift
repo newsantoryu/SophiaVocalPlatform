@@ -5,21 +5,21 @@ public struct PacketValidator {
     public init() {}
 
     public func validate(
-        header: USBPacketHeader,
+        header: SATPHeader,
         payload: Data
-    ) throws -> USBPacket {
+    ) throws -> SATPPacket {
 
         guard payload.count == Int(header.payloadSize) else {
-            throw USBPacketError.invalidPayload
+            throw SATPError.invalidPayload
         }
 
         let crc = CRC16.calculate(payload)
 
         guard crc == header.crc else {
-            throw USBPacketError.invalidCRC
+            throw SATPError.invalidCRC
         }
 
-        return USBPacket(
+        return SATPPacket(
             header: header,
             payload: payload
         )
